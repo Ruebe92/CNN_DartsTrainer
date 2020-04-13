@@ -140,7 +140,7 @@ while(cap.isOpened()):
         dif_pix = t_dif_pix + r_dif_pix
         
         
-        if dif_pix > 30000 and time_since_last_throw > 1.0:
+        if dif_pix > 30000 and time_since_last_throw > 0.66:
         
             time_last_throw = time.time()
             
