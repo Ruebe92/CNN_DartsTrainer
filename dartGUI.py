@@ -7,62 +7,57 @@ import dartshelper as dh
 import matplotlib.pyplot as plt
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from PIL import ImageTk, Image
 import cv2
 import time
 
 
-def on_click(event):
-    if event.inaxes is not None:
-        
-        print (round(event.xdata,2), round(event.ydata,2))
-    else:
-        
-        print ('Clicked ouside axes bounds but inside plot window')
-
-
-      
 class dartsGUI:
     
     
+    def on_click(self,event):
+        
+        if event.inaxes is not None:
+            
+            print (round(event.xdata,2), round(event.ydata,2))
+            
+        else:
+
+            print ('Clicked ouside axes bounds but inside plot window')
+       
     
     def __init__(self, window, window_title, video_source):
     
-        root.resizable(0, 0)
+        window.resizable(0, 0)
     
         fig, ax = dartboard.Draw_Dartboard()
         
-        self.boardCanvas = FigureCanvasTkAgg(fig, master=root)
-        self.boardCanvas.get_tk_widget().config(width=640, height=640)
+        self.boardCanvas = FigureCanvasTkAgg(fig, master= window)
+        self.boardCanvas.get_tk_widget().config(width=640, height=640, cursor="target")
         self.boardCanvas.get_tk_widget().grid(row=1, column=0, columnspan=2, rowspan=2)
         self.boardCanvas.draw()
-        self.boardCanvas.mpl_connect('button_press_event',on_click)
+        self.boardCanvas.mpl_connect('button_press_event', self.on_click)
         
-        self.videoCanvasTop = tk.Canvas(root, width = 320, height = 180)
+        self.videoCanvasTop = tk.Canvas(window, width = 320, height = 180)
         self.videoCanvasTop.grid(row=0,column=0)
-        self.videoCanvasRight = tk.Canvas(root,width= 320, height= 180)
+        self.videoCanvasRight = tk.Canvas(window,width= 320, height= 180)
         self.videoCanvasRight.grid(row=0,column=1)
         
-        self.dart1CanvasTop = tk.Canvas(root,width=320, height=180)
+        self.dart1CanvasTop = tk.Canvas(window,width=320, height=180)
         self.dart1CanvasTop.grid(row=0,column=2)
-        self.dart2CanvasTop = tk.Canvas(root,width=320, height=180)
+        self.dart2CanvasTop = tk.Canvas(window,width=320, height=180)
         self.dart2CanvasTop.grid(row=1,column=2)
-        self.dart3CanvasTop = tk.Canvas(root,width=320, height=180)
+        self.dart3CanvasTop = tk.Canvas(window,width=320, height=180)
         self.dart3CanvasTop.grid(row=2,column=2)
         
         
-        self.dart1CanvasRight = tk.Canvas(root,width=320, height=180)
+        self.dart1CanvasRight = tk.Canvas(window,width=320, height=180)
         self.dart1CanvasRight.grid(row=0,column=3) 
-        self.dart2CanvasRight = tk.Canvas(root,width=320, height=180)
+        self.dart2CanvasRight = tk.Canvas(window,width=320, height=180)
         self.dart2CanvasRight.grid(row=1,column=3)
-        self.dart3CanvasRight = tk.Canvas(root,width=320, height=180)
+        self.dart3CanvasRight = tk.Canvas(window,width=320, height=180)
         self.dart3CanvasRight.grid(row=2,column=3)
         
-        
-        
-        
-        
-        self.UIFrame = tk.Frame(root)
+        self.UIFrame = tk.Frame(window)
         self.UIFrame.grid(row=3, column=0, columnspan=4, rowspan=2)
         
         self.table = tk.Frame(self.UIFrame)
@@ -138,7 +133,12 @@ class dartsGUI:
         self.dart_counter = 0
         self.entry_Console.delete(0,40)
         self.entry_Console.insert(0,"Waiting for user...")    
-    
+        self.dart1CanvasTop.delete("all")
+        self.dart2CanvasTop.delete("all")
+        self.dart3CanvasTop.delete("all")
+        self.dart1CanvasRight.delete("all")
+        self.dart2CanvasRight.delete("all")
+        self.dart3CanvasRight.delete("all")
         
       
     def update(self):
@@ -292,9 +292,6 @@ if __name__ == "__main__":
     #%% Dart Detection
     
     draw = False
-
-    t_firstFrame = None
-    r_firstFrame = None
     delay_after_shot = 0.5
 
     t_dart_images = []
@@ -303,9 +300,8 @@ if __name__ == "__main__":
     t_baseline_Frame = None
     r_baseline_firstFrame = None
     
-    min_area = 400      #Minimal contour size to detect a valid dart
     
-    dart_counter = 0
+    
     dart_images = []
     
     #UI
@@ -326,7 +322,9 @@ if __name__ == "__main__":
     url = "http://192.168.0.42:8000/video_feed"
     
     root = tk.Tk()
+    
     GUI = dartsGUI(root, "DartyP", url)
     
-    root.mainloop()
+    
+
 
