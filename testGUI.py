@@ -2,14 +2,18 @@
 ### Own imports
 import dartboard
 #import dartshelper as dh
+import time
 
 ### Other
 import matplotlib.pyplot as plt
+from matplotlib import colors as mcolors
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 class dartsGUI:
+    
+###-------------Functionality---------------    
     
     def set_table_focus(self,focus):
         
@@ -45,6 +49,11 @@ class dartsGUI:
         
         if focus == 1:
             
+            #Draw Cross
+            self.ax.plot(x, y, "+", markersize = 18, mew = 3.5, c = self.colors["deepskyblue"])
+            self.boardCanvas.draw()
+            
+            ##Entry
             self.entry_dart1_X.delete(0,20)
             self.entry_dart1_X.insert(0,str(x))
             self.entry_dart1_Y.delete(0,20)
@@ -52,12 +61,21 @@ class dartsGUI:
               
         elif focus == 2:
             
+            #Draw Cross
+            self.ax.plot(x, y, "+", markersize = 18, mew = 3.5, c = self.colors["orangered"])
+            self.boardCanvas.draw()
+            
             self.entry_dart2_X.delete(0,20)
             self.entry_dart2_X.insert(0,str(x))
             self.entry_dart2_Y.delete(0,20)
             self.entry_dart2_Y.insert(0,str(y))
             
         elif focus == 3:
+            
+            #Draw Cross
+            self.ax.plot(x, y, "+", markersize = 18, mew = 3.5, c = self.colors["darkmagenta"])
+            self.boardCanvas.draw()
+            
             
             self.entry_dart3_X.delete(0,20)
             self.entry_dart3_X.insert(0,str(x))
@@ -71,10 +89,8 @@ class dartsGUI:
         
         if event.inaxes is not None:
             
-            #self.boardCanvas.create_oval(10, 10, 20, 20, width=2, fill='blue')
             
-            
-            self.enter_value_focus(round(event.xdata,2),round(event.ydata,2), self.dart_count)
+            self.enter_value_focus(round(event.xdata,3),round(event.ydata,3), self.dart_count)
             
             self.dart_count = self.dart_count + 1
             
@@ -83,25 +99,81 @@ class dartsGUI:
         else:
             
             print ('Clicked ouside axes bounds but inside plot window')
-    
+            
+    def reset(self):
+            
+            #Reset table
+            self.entry_dart1_X.delete(0,20)
+            self.entry_dart1_X.insert(0,str("0.00"))
+            self.entry_dart1_Y.delete(0,20)
+            self.entry_dart1_Y.insert(0,str("0.00"))
+            
+            self.entry_dart2_X.delete(0,20)
+            self.entry_dart2_X.insert(0,str("0.00"))
+            self.entry_dart2_Y.delete(0,20)
+            self.entry_dart2_Y.insert(0,str("0.00"))
+            
+            self.entry_dart3_X.delete(0,20)
+            self.entry_dart3_X.insert(0,str("0.00"))
+            self.entry_dart3_Y.delete(0,20)
+            self.entry_dart3_Y.insert(0,str("0.00"))
+
+            self.dart_count = 1
+            self.set_table_focus(self.dart_count)
+            
+            #Reset darboard
+            self.boardCanvas.get_tk_widget().grid_remove()
+            self.create_board_canvas()
+            
+    def print_to_display(self,message):
+        
+        t = time.localtime()
+        current_time = time.strftime("%H:%M:%S", t)
+        
+        statement = "\n[{0}]: {1}".format(current_time,message)
+        
+        self.text_display.insert(tk.END, statement)
+        self.text_display.see("end")
+        
+        
+            
+###-------------GUI-Creation--------------- 
+# Frames and widgets are created from top to bottom and from left to right!
+
+
     def create_board_canvas(self):
         
-        fig, ax = dartboard.Draw_Dartboard()
+        self.fig, self.ax = dartboard.Draw_Dartboard()
+        mng = plt.get_current_fig_manager()
+        mng.window.showMinimized()
+        self.boardCanvas = FigureCanvasTkAgg(self.fig, master= self.window)
         
-        self.boardCanvas = FigureCanvasTkAgg(fig, master= self.window)
+        plt.close('all')
+       
         self.boardCanvas.get_tk_widget().config(width = 640, height = 640, cursor="target")
         self.boardCanvas.get_tk_widget().grid(row=0, column=0, )
         
         self.boardCanvas.mpl_connect('button_press_event', self.on_click)
+
         
-        #plt.show()
-        plt.close('all')
+    def create_display_frame(self):
+        
+        self.text_display = tk.Text(root, height= 10, width = 65, relief="solid", borderwidth=1)
+        self.text_display.grid(row=1, column=1, padx = (50,0))
+        self.print_to_display("Application started...")
+        self.print_to_display("Waiting for user input...")
+        
+        
+        for x in range(54):
+            
+            self.print_to_display(str(x))
+        
     
     def create_UI_frame(self):
         
         ## UI
-        self.UIFrame = tk.Frame(self.window, width = 640, height = 200)
-        self.UIFrame.grid_propagate(0)
+        self.UIFrame = tk.Frame(self.window, width = 640, height = 100)
+        #self.UIFrame.grid_propagate(0)
         self.UIFrame.grid(row=1, column=0)
 
         self.create_table()
@@ -118,31 +190,7 @@ class dartsGUI:
         self.button_save_and_next = self.create_button(self.UIFrame,1, 6, 2, 1, "Save & \n Next Throw")
         self.button_save_and_next.config(bg = "green", width = 12, height = 6)
         
-        
-        
-    def reset(self):
-        
-        self.entry_dart1_X.delete(0,20)
-        self.entry_dart1_X.insert(0,str("0.00"))
-        self.entry_dart1_Y.delete(0,20)
-        self.entry_dart1_Y.insert(0,str("0.00"))
-        
-        self.entry_dart2_X.delete(0,20)
-        self.entry_dart2_X.insert(0,str("0.00"))
-        self.entry_dart2_Y.delete(0,20)
-        self.entry_dart2_Y.insert(0,str("0.00"))
-        
-        self.entry_dart3_X.delete(0,20)
-        self.entry_dart3_X.insert(0,str("0.00"))
-        self.entry_dart3_Y.delete(0,20)
-        self.entry_dart3_Y.insert(0,str("0.00"))
-        
-        self.dart_count = 1
-        self.set_table_focus(self.dart_count)
-        
-
-               
-        
+         
     def create_button(self, parent, row, column,rowspan, columnspan, text):
         button = tk.Button(parent, text = text)
         button.grid(row=row, column = column, rowspan = rowspan, columnspan = columnspan, padx=(5, 5), pady=(5,5))
@@ -168,13 +216,13 @@ class dartsGUI:
         
         
         
-        self.entry_dart1_X = self.create_tabel_entry(table, 1, 1)
-        self.entry_dart2_X = self.create_tabel_entry(table, 2, 1)
-        self.entry_dart3_X = self.create_tabel_entry(table, 3, 1)
+        self.entry_dart1_X = self.create_tabel_entry(table, 1, 1, self.colors["deepskyblue"])
+        self.entry_dart2_X = self.create_tabel_entry(table, 2, 1, self.colors["orangered"])
+        self.entry_dart3_X = self.create_tabel_entry(table, 3, 1, self.colors["darkmagenta"])
         
-        self.entry_dart1_Y = self.create_tabel_entry(table, 1, 2)
-        self.entry_dart2_Y = self.create_tabel_entry(table, 2, 2)
-        self.entry_dart3_Y = self.create_tabel_entry(table, 3, 2)
+        self.entry_dart1_Y = self.create_tabel_entry(table, 1, 2, self.colors["deepskyblue"])
+        self.entry_dart2_Y = self.create_tabel_entry(table, 2, 2, self.colors["orangered"])
+        self.entry_dart3_Y = self.create_tabel_entry(table, 3, 2, self.colors["darkmagenta"])
         
         
         
@@ -188,9 +236,9 @@ class dartsGUI:
         
     
         
-    def create_tabel_entry(self, parent, row, column):
+    def create_tabel_entry(self, parent, row, column, color):
         
-        entry = tk.Entry(parent, justify='right', borderwidth=1, relief="solid", width = 10)
+        entry = tk.Entry(parent, justify='right', borderwidth=1, relief="solid", width = 10, bg = color)
         entry.insert(0,"0.00")
         entry.grid(row=row, column=column, padx=(10, 10), pady=(10,10))
         entry.config(font=('verdana', 12))
@@ -200,7 +248,7 @@ class dartsGUI:
     def create_video_frame(self):
         
         ## Video
-        videoFrame = tk.Frame(self.window, bg = "green", width = 640, height = 840)
+        videoFrame = tk.Frame(self.window, bg = "green")
         videoFrame.grid(row=0, column=1, rowspan = 2, columnspan = 1)
         videoFrame.grid_propagate(0)
         
@@ -210,15 +258,13 @@ class dartsGUI:
         self.videoCanvasRight.grid(row=0,column=1)
         
     
-        
-        
-    
-    
     def __init__(self, window, window_title):
     
         window.geometry("1280x840")    
         
         window.resizable(0, 0)
+        
+        self.colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
         
         self.window = window
         
@@ -228,23 +274,18 @@ class dartsGUI:
         
         self.create_UI_frame()
         
+        
+        
         self.create_video_frame()
         
         self.dart_count = 1
         self.set_table_focus(self.dart_count)
         
-       
+        self.create_display_frame()
         
         
                 
         self.window.mainloop()
-        
-        
-        
-    
-        
-        
-
 
 
 if __name__ == "__main__":
