@@ -73,6 +73,3 @@ def Draw_Dartboard():
     
     return fig, ax
 
-
-
-

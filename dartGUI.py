@@ -28,8 +28,11 @@ class dartsGUI:
     def __init__(self, window, window_title, video_source):
     
         window.resizable(0, 0)
-    
+        
         fig, ax = dartboard.Draw_Dartboard()
+        
+    def create_root():
+        
         
         self.boardCanvas = FigureCanvasTkAgg(fig, master= window)
         self.boardCanvas.get_tk_widget().config(width=640, height=640, cursor="target")
@@ -110,8 +113,6 @@ class dartsGUI:
         # open video source (by default this will try to open the computer webcam)        
         self.vid = MyVideoCapture(self.video_source)
          
-        
-        
         # Darts Detection
         self.detection = True
         self.min_pix = 15000
