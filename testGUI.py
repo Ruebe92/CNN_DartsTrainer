@@ -151,30 +151,16 @@ class dartsGUI:
         plt.close('all')
        
         self.boardCanvas.get_tk_widget().config(width = 640, height = 640, cursor="target")
-        self.boardCanvas.get_tk_widget().grid(row=0, column=0, )
+        self.boardCanvas.get_tk_widget().grid(row=0, column=0, rowspan = 3)
         
         self.boardCanvas.mpl_connect('button_press_event', self.on_click)
-
         
-    def create_display_frame(self):
-        
-        self.text_display = tk.Text(root, height= 10, width = 65, relief="solid", borderwidth=1)
-        self.text_display.grid(row=1, column=1, padx = (50,0))
-        self.print_to_display("Application started...")
-        self.print_to_display("Waiting for user input...")
-        
-        
-        for x in range(54):
-            
-            self.print_to_display(str(x))
-        
-    
     def create_UI_frame(self):
         
         ## UI
         self.UIFrame = tk.Frame(self.window, width = 640, height = 100)
         #self.UIFrame.grid_propagate(0)
-        self.UIFrame.grid(row=1, column=0)
+        self.UIFrame.grid(row=3, column=0, rowspan = 2)
 
         self.create_table()
         
@@ -189,6 +175,44 @@ class dartsGUI:
         
         self.button_save_and_next = self.create_button(self.UIFrame,1, 6, 2, 1, "Save & \n Next Throw")
         self.button_save_and_next.config(bg = "green", width = 12, height = 6)
+    
+    def create_video_frame(self):
+        
+        ## Video
+        videoFrame = tk.Frame(self.window, width= 660, height = 640, relief="solid", borderwidth=1)
+        videoFrame.grid(row=0, column=1, rowspan = 3)
+        videoFrame.grid_propagate(0)
+        
+        label_video_top = tk.Label(videoFrame, text = "Top View")
+        label_video_top.grid(row = 0, column = 0)
+        
+        label_video_right = tk.Label(videoFrame, text = "Side View")
+        label_video_right.grid(row = 0, column = 1)
+        
+        
+        self.canvas_video_top = tk.Canvas(videoFrame, width = 320, height = 180, relief="solid", borderwidth=1)
+        self.canvas_video_top.grid(row=1,column = 0)
+        
+        self.canvas_video_right = tk.Canvas(videoFrame, width = 320, height = 180, relief="solid", borderwidth=1)
+        self.canvas_video_right.grid(row=1,column = 1)
+        
+        self.button_connect = self.create_button(videoFrame,3,0,1,1, "Connect")
+        
+        self.entry_ip = tk.Entry(videoFrame, width = 20, justify='center')
+        self.entry_ip.grid(row = 2, column = 0)
+        self.entry_ip.configure(font=('verdana', 10))
+        self.entry_ip.insert(0, "192.168.0.42/8000")
+    
+        
+    def create_display_frame(self):
+        
+        self.text_display = tk.Text(root, height= 10, width = 65, relief="solid", borderwidth=1)
+        self.text_display.grid(row=3, column=1, rowspan = 2, padx = (50,0))
+        self.print_to_display("Application started...")
+        self.print_to_display("Waiting for video device...")
+        
+    
+    
         
          
     def create_button(self, parent, row, column,rowspan, columnspan, text):
@@ -214,8 +238,6 @@ class dartsGUI:
         label_dart2 = self.create_table_label(table, 2, 0,"2")
         label_dart3 = self.create_table_label(table, 3, 0,"3")
         
-        
-        
         self.entry_dart1_X = self.create_tabel_entry(table, 1, 1, self.colors["deepskyblue"])
         self.entry_dart2_X = self.create_tabel_entry(table, 2, 1, self.colors["orangered"])
         self.entry_dart3_X = self.create_tabel_entry(table, 3, 1, self.colors["darkmagenta"])
@@ -223,7 +245,6 @@ class dartsGUI:
         self.entry_dart1_Y = self.create_tabel_entry(table, 1, 2, self.colors["deepskyblue"])
         self.entry_dart2_Y = self.create_tabel_entry(table, 2, 2, self.colors["orangered"])
         self.entry_dart3_Y = self.create_tabel_entry(table, 3, 2, self.colors["darkmagenta"])
-        
         
         
     def create_table_label(self,parent, row, column, text):
@@ -245,22 +266,14 @@ class dartsGUI:
         
         return entry
     
-    def create_video_frame(self):
+    
         
-        ## Video
-        videoFrame = tk.Frame(self.window, bg = "green")
-        videoFrame.grid(row=0, column=1, rowspan = 2, columnspan = 1)
-        videoFrame.grid_propagate(0)
         
-        self.videoCanvasTop = tk.Canvas(videoFrame, width = 320, height = 180, bg = "black")
-        self.videoCanvasTop.grid(row=0,column=0)
-        self.videoCanvasRight = tk.Canvas(videoFrame,width= 320, height= 180, bg = "blue")
-        self.videoCanvasRight.grid(row=0,column=1)
         
     
     def __init__(self, window, window_title):
     
-        window.geometry("1280x840")    
+        window.geometry("1600x840")    
         
         window.resizable(0, 0)
         
@@ -274,14 +287,14 @@ class dartsGUI:
         
         self.create_UI_frame()
         
-        
+        self.create_display_frame()
         
         self.create_video_frame()
         
         self.dart_count = 1
         self.set_table_focus(self.dart_count)
         
-        self.create_display_frame()
+        
         
         
                 
