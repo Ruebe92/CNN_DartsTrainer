@@ -1,7 +1,7 @@
 #%%
 ### Own imports
 import dartboard
-#import dartshelper as dh
+import dartshelper as dh
 import time
 
 ### Other
@@ -9,6 +9,39 @@ import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import cv2
+
+class MyVideoCapture:
+     
+    def __init__(self, video_source):
+         # Open the video source
+         self.vid = cv2.VideoCapture(video_source)
+         
+         if not self.vid.isOpened():
+             raise ValueError("Unable to open video source", video_source)
+ 
+         # Get video source width and height         
+         self.width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)
+         self.height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
+ 
+    def get_frame(self):
+         if self.vid.isOpened():
+             ret, frame = self.vid.read()
+             if ret:
+                 # Return a boolean success flag and the current frame converted to BGR                 
+                 return (ret, cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))             
+             else:
+                 return (ret, None)
+         else:
+             return (ret, None) 
+     
+    # Release the video source when the object is destroyed
+    def __del__(self):         
+        
+        if self.vid.isOpened():             
+
+            self.vid.release()    
+
 
 
 class dartsGUI:
@@ -134,6 +167,42 @@ class dartsGUI:
         
         self.text_display.insert(tk.END, statement)
         self.text_display.see("end")
+    
+    def connect(self):
+        
+        url = "http://192.168.0.42:8000/video_feed"
+        
+        try:
+            self.vid = MyVideoCapture(url)
+            self.connected = True
+        
+        except:
+            
+            self.print_to_display("Could not connect")
+        
+    
+   
+    def update(self):
+        
+        if self.connected == True:
+        
+            self.print_to_display("connected!!!!")
+            
+            # Get a frame from the video source
+            ret, frame = self.vid.get_frame()
+        
+            if ret:
+            
+                t_image, r_image, t_image_raw, r_image_raw = dh.process_frame(frame, 31)
+                
+                self.photoTop = dh.resize_create(t_image_raw, 25)
+                self.photoRight = dh.resize_create(r_image_raw, 25)
+                        
+                self.canvas_video_top.create_image(0, 0, image = self.photoTop, anchor = tk.NW)
+                self.canvas_video_right.create_image(0, 0, image = self.photoRight, anchor = tk.NW)
+            
+
+        self.window.after(self.delay, self.update)
         
         
             
@@ -197,6 +266,7 @@ class dartsGUI:
         self.canvas_video_right.grid(row=1,column = 1)
         
         self.button_connect = self.create_button(videoFrame,3,0,1,1, "Connect")
+        self.button_connect.config(command = self.connect)
         
         self.entry_ip = tk.Entry(videoFrame, width = 20, justify='center')
         self.entry_ip.grid(row = 2, column = 0)
@@ -294,7 +364,14 @@ class dartsGUI:
         self.dart_count = 1
         self.set_table_focus(self.dart_count)
         
+        self.connected = False
         
+        # After it is called once, the update method will be automatically called every delay milliseconds
+        
+        
+        
+        self.delay = 15
+        self.update()
         
         
                 
