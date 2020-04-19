@@ -58,7 +58,9 @@ def calc_background_dif(image, background_image, name, debug):
             
             if cv2.contourArea(con) > 400:
                 
-                print(name + "  " +str(cv2.contourArea(con)))
+                if debug:
+                
+                    print(name + "  " +str(cv2.contourArea(con)))
                 
                 n_dif_pix.append(cv2.contourArea(con))
                 
