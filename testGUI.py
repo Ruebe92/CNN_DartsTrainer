@@ -10,6 +10,7 @@ from matplotlib import colors as mcolors
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import cv2
+import numpy as np
 
 class MyVideoCapture:
      
@@ -123,11 +124,11 @@ class dartsGUI:
         if event.inaxes is not None:
             
             
-            self.enter_value_focus(round(event.xdata,3),round(event.ydata,3), self.dart_count)
+            self.enter_value_focus(round(event.xdata,3),round(event.ydata,3), self.dart_count_table)
             
-            self.dart_count = self.dart_count + 1
+            self.dart_count_table = self.dart_count_table + 1
             
-            self.set_table_focus(self.dart_count)
+            self.set_table_focus(self.dart_count_table)
         
         else:
             
@@ -158,6 +159,9 @@ class dartsGUI:
             self.boardCanvas.get_tk_widget().grid_remove()
             self.create_board_canvas()
             
+            self.print_to_display("Values resetted!")
+            
+            
     def print_to_display(self,message):
         
         t = time.localtime()
@@ -173,12 +177,97 @@ class dartsGUI:
         url = "http://192.168.0.42:8000/video_feed"
         
         try:
+            self.print_to_display("Trying to connect...")
             self.vid = MyVideoCapture(url)
             self.connected = True
+            self.print_to_display("Sucessfully connected!")
         
         except:
             
-            self.print_to_display("Could not connect")
+            self.print_to_display("Could not connect - Please check raspberry pi!")
+            
+            
+    def display_images(self, t_image_raw, r_image_raw):
+        
+        if self.draw_border.get() == 1:
+                    
+            t_image = dh.add_outline_marker(t_image_raw, self.t_bl_color, self.t_bl_alpha)
+            r_image = dh.add_outline_marker(r_image_raw, self.r_bl_color, self.r_bl_alpha)
+                    
+            self.photoTop = dh.resize_create(t_image, 40)
+            self.photoRight = dh.resize_create(r_image, 40)
+                    
+        else:
+                    
+                    
+            self.photoTop = dh.resize_create(t_image_raw, 40)
+            self.photoRight = dh.resize_create(r_image_raw, 40)
+             
+        self.canvas_video_top.create_image(0, 0, image = self.photoTop, anchor = tk.NW)
+        self.canvas_video_right.create_image(0, 0, image = self.photoRight, anchor = tk.NW)
+        
+        
+    def detect_darts(self, t_image, r_image, t_image_raw, r_image_raw):
+        
+        if self.detection:
+            
+                time_since_last_throw = round(time.time() - self.time_last_throw, 2)
+                
+                ## Get pixel differences over the two pictures
+                t_dif_pix, self.t_firstFrame = dh.calc_background_dif(t_image, self.t_firstFrame, "TOP", False)
+                
+                r_dif_pix, self.r_firstFrame = dh.calc_background_dif(r_image, self.r_firstFrame, "RIGHT", False)
+                
+                dif_pix = t_dif_pix + r_dif_pix
+                
+                if dif_pix > self.min_pix and time_since_last_throw > 0.5:
+                
+                    self.time_last_throw = time.time()
+                    
+                    
+                    #Set the Background frames to None to force the app to get new images after the delay
+                    self.t_firstFrame = None
+                    self.r_firstFrame = None
+                    
+                    self.dart_counter = self.dart_counter + 1    
+                    
+                    
+                    self.print_to_display(str(self.dart_counter) + ". dart thrown: " + str(dif_pix) + " white pixels")
+                    
+                    
+                    if self.dart_counter == 1:
+                        
+                        self.t_dart_images.append(t_image_raw)
+                        self.r_dart_images.append(r_image_raw)
+                    
+                    elif self.dart_counter == 2:
+                        
+                        self.t_dart_images.append(t_image_raw)
+                        self.r_dart_images.append(r_image_raw)
+                    
+                    
+                    elif self.dart_counter == 3:
+                        
+                        self.t_dart_images.append(t_image_raw)
+                        self.r_dart_images.append(r_image_raw)
+                        
+                        
+                        self.detection = False
+                        self.print_to_display("Detection set to False, get the darts")
+                        
+                        
+                        
+                    ##Delay a bit to get a still board again
+                    time.sleep(self.delay_after_shot)
+                    
+                        
+            
+                
+                # Save Data for analysis
+                #t_pix_array.append(t_dif_pix)
+                #r_pix_array.append(r_dif_pix)
+                #pix_array.append(dif_pix)
+                #time_array.append(round(time.time() - time_start,2))
         
     
    
@@ -186,8 +275,6 @@ class dartsGUI:
         
         if self.connected == True:
         
-            self.print_to_display("connected!!!!")
-            
             # Get a frame from the video source
             ret, frame = self.vid.get_frame()
         
@@ -195,11 +282,12 @@ class dartsGUI:
             
                 t_image, r_image, t_image_raw, r_image_raw = dh.process_frame(frame, 31)
                 
-                self.photoTop = dh.resize_create(t_image_raw, 25)
-                self.photoRight = dh.resize_create(r_image_raw, 25)
-                        
-                self.canvas_video_top.create_image(0, 0, image = self.photoTop, anchor = tk.NW)
-                self.canvas_video_right.create_image(0, 0, image = self.photoRight, anchor = tk.NW)
+                self.display_images(t_image_raw, r_image_raw)
+                
+                self.detect_darts(t_image, r_image, t_image_raw, r_image_raw)
+                
+                
+                    
             
 
         self.window.after(self.delay, self.update)
@@ -224,59 +312,77 @@ class dartsGUI:
         
         self.boardCanvas.mpl_connect('button_press_event', self.on_click)
         
-    def create_UI_frame(self):
+    def create_UI_frame_left(self):
         
         ## UI
-        self.UIFrame = tk.Frame(self.window, width = 640, height = 100)
-        #self.UIFrame.grid_propagate(0)
-        self.UIFrame.grid(row=3, column=0, rowspan = 2)
+        self.UIFrame_left = tk.Frame(self.window, width = 640, height = 100)
+        #self.UIFrame_left.grid_propagate(0)
+        self.UIFrame_left.grid(row=3, column=0, rowspan = 2)
 
         self.create_table()
         
-        self.button_reset = self.create_button(self.UIFrame,0, 5, 1, 1, "Reset Values")
+        self.button_reset = self.create_button(self.UIFrame_left,0, 5, 1, 1, "Reset Values")
         self.button_reset.config(command = self.reset, bg = "red",width = 12, height = 2)
         
-        self.button_delete = self.create_button(self.UIFrame,0, 6, 1, 1, "Delete Throws")
+        self.button_delete = self.create_button(self.UIFrame_left,0, 6, 1, 1, "Delete Throws")
         self.button_delete.config(bg = "red",width = 12, height = 2)
         
-        self.button_delete_and_next = self.create_button(self.UIFrame,1, 5, 2, 1, "Delete & \n Next Throw")
+        self.button_delete_and_next = self.create_button(self.UIFrame_left,1, 5, 2, 1, "Delete & \n Next Throw")
         self.button_delete_and_next.config(bg = "red",width = 12, height = 6)
         
-        self.button_save_and_next = self.create_button(self.UIFrame,1, 6, 2, 1, "Save & \n Next Throw")
+        self.button_save_and_next = self.create_button(self.UIFrame_left,1, 6, 2, 1, "Save & \n Next Throw")
         self.button_save_and_next.config(bg = "green", width = 12, height = 6)
     
     def create_video_frame(self):
         
         ## Video
-        videoFrame = tk.Frame(self.window, width= 660, height = 640, relief="solid", borderwidth=1)
-        videoFrame.grid(row=0, column=1, rowspan = 3)
+        videoFrame = tk.Frame(self.window, width = 512 * 2 + 40  ,height = 640)
+        videoFrame.grid(row=0, column=1, rowspan = 2)
         videoFrame.grid_propagate(0)
         
+        self.canvas_video_top = tk.Canvas(videoFrame, width = 502, height = 278, relief="solid", borderwidth=3)
+        self.canvas_video_top.grid(row=1,column = 1)
+
+        self.canvas_video_right = tk.Canvas(videoFrame, width = 502, height = 278, relief="solid", borderwidth=3)
+        self.canvas_video_right.grid(row=3,column = 1)
+        
+        
         label_video_top = tk.Label(videoFrame, text = "Top View")
-        label_video_top.grid(row = 0, column = 0)
+        label_video_top.grid(row = 0, column = 1)
         
         label_video_right = tk.Label(videoFrame, text = "Side View")
-        label_video_right.grid(row = 0, column = 1)
+        label_video_right.grid(row = 2, column = 1)
         
         
-        self.canvas_video_top = tk.Canvas(videoFrame, width = 320, height = 180, relief="solid", borderwidth=1)
-        self.canvas_video_top.grid(row=1,column = 0)
+    def create_UI_frame_right(self):
+       
+        UIFrame = tk.Frame(self.window, width = 640, height = 100)
+        UIFrame.grid_propagate(0)
+        UIFrame.grid(row=1, column=1, columnspan = 2, sticky= tk.N)
         
-        self.canvas_video_right = tk.Canvas(videoFrame, width = 320, height = 180, relief="solid", borderwidth=1)
-        self.canvas_video_right.grid(row=1,column = 1)
-        
-        self.button_connect = self.create_button(videoFrame,3,0,1,1, "Connect")
-        self.button_connect.config(command = self.connect)
-        
-        self.entry_ip = tk.Entry(videoFrame, width = 20, justify='center')
-        self.entry_ip.grid(row = 2, column = 0)
-        self.entry_ip.configure(font=('verdana', 10))
+        self.entry_ip = tk.Entry(UIFrame, width = 20, justify='center')
+        self.entry_ip.grid(row = 0, column = 0)
+        self.entry_ip.configure(font=('verdana', 8))
         self.entry_ip.insert(0, "192.168.0.42/8000")
-    
+        
+        self.button_connect = self.create_button(UIFrame,2,1,1,1, "Connect")
+        self.button_connect.config(command = self.connect)
+        self.button_connect.grid(row = 0, column = 1)
+        
+        
+ 
+        chkExample = tk.Checkbutton(UIFrame, text='Draw Calibration Contour', var= self.draw_border) 
+        chkExample.grid(row=2,column=1)
+        
+
+        w = tk.Scale(UIFrame, from_=0, to=50000, orient=tk.HORIZONTAL)
+        w.grid(row = 1, column = 1)
+        
+        
         
     def create_display_frame(self):
         
-        self.text_display = tk.Text(root, height= 10, width = 65, relief="solid", borderwidth=1)
+        self.text_display = tk.Text(self.window, height= 10, width = 65, relief="solid", borderwidth=1)
         self.text_display.grid(row=3, column=1, rowspan = 2, padx = (50,0))
         self.print_to_display("Application started...")
         self.print_to_display("Waiting for video device...")
@@ -296,7 +402,7 @@ class dartsGUI:
     def create_table(self):
         
         ## Table
-        table = tk.Frame(self.UIFrame, width = 390, height = 200)  
+        table = tk.Frame(self.UIFrame_left, width = 390, height = 200)  
         table.grid(row = 0, column = 0, rowspan = 4, columnspan = 4, padx = (20,0))
         table.grid_propagate(0)
         
@@ -337,40 +443,64 @@ class dartsGUI:
         return entry
     
     
-        
-        
-        
-    
     def __init__(self, window, window_title):
     
-        window.geometry("1600x840")    
-        
-        window.resizable(0, 0)
-        
+
+        ## Variables
         self.colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
+        self.connected = False
+        self.draw_border = tk.IntVar()
         
+        
+        # Darts Detection
+        self.detection = True
+        self.min_pix = 15000
+        self.dart_counter = 0
+        self.time_last_throw = time.time() - 1
+        self.t_firstFrame = None
+        self.r_firstFrame = None
+        self.delay_after_shot = 0.3
+        self.dart_count_detection = 0
+        
+        self.t_dart_images = []
+        self.r_dart_images = []
+        
+        self.dart_count_table = 1
+        
+        ##Timings
+        
+        self.time_start = time.time()
+        
+        ## 
         self.window = window
-        
+        self.window.geometry("1600x840")    
+        self.window.resizable(0, 0)
         self.window.title(window_title)
     
         self.create_board_canvas()
         
-        self.create_UI_frame()
+        self.create_UI_frame_left()
         
         self.create_display_frame()
         
         self.create_video_frame()
         
-        self.dart_count = 1
-        self.set_table_focus(self.dart_count)
+        self.create_UI_frame_right()
         
-        self.connected = False
+        self.set_table_focus(self.dart_count_table)
+        
+        
+        ## Create baseline images
+        t_bl = cv2.imread("t_image_raw_baseline.jpg")
+        r_bl = cv2.imread("r_image_raw_baseline.jpg")
+        
+        self.t_bl_color, self.t_bl_alpha = dh.outline_from_image(t_bl, 180, 300, 500)
+        self.r_bl_color, self.r_bl_alpha = dh.outline_from_image(r_bl, 180, 300, 500)
+        
         
         # After it is called once, the update method will be automatically called every delay milliseconds
         
-        
-        
-        self.delay = 15
+        self.delay = 1
         self.update()
         
         
@@ -379,8 +509,6 @@ class dartsGUI:
 
 
 if __name__ == "__main__":
-    
-    
     
     root = tk.Tk()
     GUI = dartsGUI(root, "DartyP")
