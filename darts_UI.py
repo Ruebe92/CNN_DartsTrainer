@@ -10,8 +10,6 @@ from matplotlib import colors as mcolors
 
 import dartshelper as dh
 
-colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
-
 class Frame(tk.Frame): 
 
     def __init__(self, parent, width, height, row, column, main):
@@ -30,7 +28,7 @@ class Frame_UI_Left(Frame):
         super().__init__(parent, width, height, row, column, main)
         
         
-        self.table = Table(self, 390, 200, 0, 0)
+        self.table = Table(self, 390, 200, 0, 0, main)
         
         self.button_reset = Button(self,0, 5, 1, 1, "Reset Values")
         self.button_reset.config(command = main.reset, bg = "red",width = 12, height = 2)
@@ -210,7 +208,7 @@ class Entry(tk.Entry):
 
 class Table:
     
-    def __init__(self, parent, width, height, row, column):
+    def __init__(self, parent, width, height, row, column, main):
         
         table = tk.Frame(parent, width = 390, height = 200)  
         table.grid(row = 0, column = 0, rowspan = 4, columnspan = 4, padx = (20,0))
@@ -229,13 +227,13 @@ class Table:
         self.list_entry_X = []
         self.list_entry_Y = []
         
-        self.list_entry_X.append(Entry(table, 1, 1, colors["deepskyblue"]))
-        self.list_entry_X.append(Entry(table, 2, 1, colors["orangered"]))
-        self.list_entry_X.append(Entry(table, 3, 1, colors["darkmagenta"]))
+        self.list_entry_X.append(Entry(table, 1, 1, main.dart_colors[0]))
+        self.list_entry_X.append(Entry(table, 2, 1, main.dart_colors[1]))
+        self.list_entry_X.append(Entry(table, 3, 1, main.dart_colors[2]))
         
-        self.list_entry_Y.append(Entry(table, 1, 2, colors["deepskyblue"]))
-        self.list_entry_Y.append(Entry(table, 2, 2, colors["orangered"]))
-        self.list_entry_Y.append(Entry(table, 3, 2, colors["darkmagenta"]))
+        self.list_entry_Y.append(Entry(table, 1, 2, main.dart_colors[0]))
+        self.list_entry_Y.append(Entry(table, 2, 2, main.dart_colors[1]))
+        self.list_entry_Y.append(Entry(table, 3, 2, main.dart_colors[2]))
         
         
     def reset(self):
@@ -249,6 +247,22 @@ class Table:
             
             entry.reset()
             
+        self.focus = 0
+        
+        self.update_table_focus()
+        
+        
+    def on_click(self, x, y):
+        
+        self.enter_value(x,y)
+
+        if self.focus < 2:
+           
+           self.focus += 1
+           
+        self.update_table_focus()
+        
+        
         
     def enter_value(self, x, y):
               
@@ -258,9 +272,9 @@ class Table:
         self.list_entry_Y[self.focus].delete(0,20)
         self.list_entry_Y[self.focus].insert(0,str(y))  
         
-    
-    def change_table_focus(self):
-    
+        
+    def update_table_focus(self):
+        
         # Reset all borders to default
         for entry in self.list_entry_X:
             
@@ -272,8 +286,11 @@ class Table:
         
         # Apply changes to the focused ones
         self.list_entry_X[self.focus].config(borderwidth = 3)
-        self.list_entry_Y[self.focus].config(borderwidth = 3)  
-           
+        self.list_entry_Y[self.focus].config(borderwidth = 3) 
+            
+            
+            
+          
 
 
 

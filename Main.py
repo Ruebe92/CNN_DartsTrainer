@@ -9,6 +9,8 @@ import tkinter as tk
 import time
 import cv2
 
+from matplotlib import colors as mcolors
+
 
 class Main:
     
@@ -16,7 +18,7 @@ class Main:
         
         self.text_display.print_to_display("Application started...")
         self.time_last_throw = time.time()
-        self.frame_UI_left.table.change_table_focus()
+        self.frame_UI_left.table.update_table_focus()
     
     def reset(self):
         
@@ -73,10 +75,7 @@ class Main:
                     
                     
                     self.dart_count_detection = dh.count_and_save(self, self.dart_count_detection, t_image_raw, r_image_raw, pix_dif)
-                
-                
-                
-                
+         
 
         self.window.after(self.delay, self.update)
     
@@ -98,6 +97,15 @@ class Main:
         self.r_first_frame = None
         self.dart_count_detection = 0
         self.dart_count_table = 1
+
+        
+        colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
+        dart_colors = []
+        dart_colors.append(colors["deepskyblue"])
+        dart_colors.append(colors["orangered"])
+        dart_colors.append(colors["darkmagenta"])
+        
+        self.dart_colors = dart_colors
         
         # Results
         self.t_dart_images = []
@@ -120,12 +128,10 @@ class Main:
         
         self.start()
         
-        
         self.update()
         
         self.window.mainloop()
-        
-        
+                
         
 if __name__ == "__main__":
     

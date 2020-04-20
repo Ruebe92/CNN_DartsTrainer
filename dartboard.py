@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 import matplotlib.patches as patches
 import numpy as np
 import math
 import tkinter
 
-#Dartboard-Dimensions
+
 def Draw_Dartboard():
     
     r_full = 45.5/2
@@ -29,22 +30,15 @@ def Draw_Dartboard():
     arc = patches.Arc((0,0),0, 100, angle= 10, theta1=3 , theta2=360.0)
     
     
-    fig, ax = plt.subplots()
+    fig = plt.figure(figsize = (2.5,2.5))
     
-    plt.axis('scaled')
-    
+    ax = fig.add_subplot(111)
+        
     ax.add_artist(board_full)
     ax.add_artist(outer_double)
     ax.add_artist(inner_double)
     ax.add_artist(outer_triple)
     ax.add_artist(inner_triple)
-    
-    #angle = - (360/20/2)
-        
-    #x = math.cos(math.radians(angle)) * r_outer_double
-    #y = math.sin(math.radians(angle)) * r_outer_double
-    
-    #plt.plot([0, x], [0, y], color='k', linestyle='-', linewidth=2, zorder = 1)
     
     field_number = ["6","13","4","18","1","20","5","12","9","14","11","8","16","7","19","3","17","2","15","10"]
     
@@ -55,7 +49,7 @@ def Draw_Dartboard():
         x1 = math.cos(math.radians(angle1)) * r_outer_double
         y1 = math.sin(math.radians(angle1)) * r_outer_double
         
-        plt.plot([0, x1], [0, y1], color='k', linestyle='-', linewidth=2, zorder = 1)
+        ax.plot([0, x1], [0, y1], color='k', linestyle='-', linewidth=2, zorder = 1)
         
         angle_text = 360/20 * seg
         
@@ -69,7 +63,8 @@ def Draw_Dartboard():
     
     ax.axis(xmin=-30,xmax=30)
     ax.axis(ymin=-30,ymax=30)
-    
-    
+
+
     return fig, ax
+
 

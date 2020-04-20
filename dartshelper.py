@@ -5,7 +5,17 @@ import numpy as np
 import time
 
 
-#%% Functions
+class Dart_Detector():
+    
+    def __init__(self):
+        
+        
+    
+
+
+
+
+
 
 # Takes the image from the webcam, grayscales it, blurs it and saves 4 images: top_processed, right_processed, top_raw, right_raw
 def process_frame(frame, blur):
@@ -101,7 +111,7 @@ def detect_darts(detection, time_last_throw, image, first_frame):
                        
             return dif_pix, first_frame
            
-def count_and_save(main, dart_counter, t_image_raw, r_image_raw, dif_pix):   
+def count_darts(main, dart_counter, t_image_raw, r_image_raw, dif_pix):   
 
 
     main.time_last_throw = time.time()
@@ -114,18 +124,7 @@ def count_and_save(main, dart_counter, t_image_raw, r_image_raw, dif_pix):
     
     main.text_display.print_to_display(str(dart_counter) + ". dart thrown: " + str(dif_pix) + " white pixels")
     
-    if dart_counter == 1:
-        
-        main.t_dart_images.append(t_image_raw)
-        main.r_dart_images.append(r_image_raw)
-    
-    elif dart_counter == 2:
-        
-        main.t_dart_images.append(t_image_raw)
-        main.r_dart_images.append(r_image_raw)
-    
-    
-    elif main.dart_counter == 3:
+    if main.dart_counter == 3:
         
         main.t_dart_images.append(t_image_raw)
         main.r_dart_images.append(r_image_raw)
@@ -141,7 +140,11 @@ def count_and_save(main, dart_counter, t_image_raw, r_image_raw, dif_pix):
     time.sleep(1)
     
     return dart_counter
-            
+ 
+def save_images(counter, ):
+
+
+       
 
 def outline_from_image(image, bw_threshold, cannyMin, cannyMax):
 
