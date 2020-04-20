@@ -2,7 +2,7 @@
 ### Own imports
 import dartboard
 import dartshelper as dh
-from DartVideoCapture import *
+from DartsVideoCapture import *
 
 ### Other
 import matplotlib.pyplot as plt
@@ -18,7 +18,8 @@ import cv2
 import numpy as np
 
 
-class dartsGUI:
+
+class DartsGUI:
     
 ###-------------Functionality---------------    
     
@@ -283,7 +284,7 @@ class dartsGUI:
         
         
             
-###-------------GUI-Creation--------------- 
+# ##-------------GUI-Creation--------------- 
 # Frames and widgets are created from top to bottom and from left to right!
 
 
@@ -465,6 +466,7 @@ class dartsGUI:
         self.r_firstFrame = None
         self.delay_after_shot = 1
         self.dart_count_detection = 0
+        self.dart_count_table = 1
         
         # Threshold
         self.pix_array = []
@@ -475,7 +477,7 @@ class dartsGUI:
         self.t_dart_images = []
         self.r_dart_images = []
         
-        self.dart_count_table = 1
+        
         
         ##Timings
         
@@ -533,7 +535,7 @@ class dartsGUI:
 if __name__ == "__main__":
     
     root = tk.Tk()
-    GUI = dartsGUI(root, "DartyP")
+    GUI = DartsGUI(root, "DartyP")
     
     
 

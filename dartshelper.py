@@ -2,6 +2,8 @@ import imutils
 import cv2
 from PIL import ImageTk, Image
 import numpy as np
+import time
+
 
 #%% Functions
 
@@ -89,7 +91,57 @@ def resize_create(image, scale_percent):
     photo = ImageTk.PhotoImage(image = Image.fromarray(resizedImage))
     
     return photo
+
+def detect_darts(detection, time_last_throw, image, first_frame):
     
+    if detection:
+        
+            ## Get pixel differences over the two pictures
+            dif_pix, first_frame = calc_background_dif(image, first_frame, "TOP", False)
+                       
+            return dif_pix, first_frame
+           
+def count_and_save(main, dart_counter, t_image_raw, r_image_raw, dif_pix):   
+
+
+    main.time_last_throw = time.time()
+    
+    #Set the Background frames to None to force the app to get new images after the delay
+    main.t_firstFrame = None
+    main.r_firstFrame = None
+    
+    dart_counter = dart_counter + 1    
+    
+    main.text_display.print_to_display(str(dart_counter) + ". dart thrown: " + str(dif_pix) + " white pixels")
+    
+    if dart_counter == 1:
+        
+        main.t_dart_images.append(t_image_raw)
+        main.r_dart_images.append(r_image_raw)
+    
+    elif dart_counter == 2:
+        
+        main.t_dart_images.append(t_image_raw)
+        main.r_dart_images.append(r_image_raw)
+    
+    
+    elif main.dart_counter == 3:
+        
+        main.t_dart_images.append(t_image_raw)
+        main.r_dart_images.append(r_image_raw)
+        
+        
+        main.detection = False
+        main.text_display.print_to_display("Detection set to False, get the darts")
+        
+        main.time_start_throw = time.time()
+        main.button_save_and_next.config(state = "normal")
+
+    ##Delay a bit to get a still board again
+    time.sleep(1)
+    
+    return dart_counter
+            
 
 def outline_from_image(image, bw_threshold, cannyMin, cannyMax):
 
@@ -112,13 +164,6 @@ def outline_from_image(image, bw_threshold, cannyMin, cannyMax):
     
     return colorRgb, alphaRgb
     
-    
-
-
-
-
-
-
 def add_outline_marker(background, foreground, alpha):
 
     foreground = foreground.astype(float)
