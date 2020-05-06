@@ -40,7 +40,7 @@ class Frame_UI_Left(Frame):
         self.button_delete_and_next.config(bg = "red",width = 12, height = 6, state = "normal")
         
         self.button_save_and_next = Button(self,1, 6, 2, 1, "Save & \n Next Throw")
-        self.button_save_and_next.config(command = main.next_throw, bg = "green", width = 12, height = 6, state = "disabled")
+        self.button_save_and_next.config(command = main.next_throw, bg = "green", width = 12, height = 6)
 
 class Frame_UI_Right(Frame):
     
@@ -57,7 +57,6 @@ class Frame_UI_Right(Frame):
         
         self.entry_ip = tk.Entry(self, width = 20, justify='center')
         self.entry_ip.grid(row = 1, column = 0)
-         
         self.entry_ip.configure(font=('verdana', 8))
         self.entry_ip.insert(0, "192.168.0.42/8000")
         
@@ -70,11 +69,15 @@ class Frame_UI_Right(Frame):
         self.checkbutton_draw_contour = tk.Checkbutton(self, text='Draw Calibration Contour', var= main.draw_border) 
         self.checkbutton_draw_contour.grid(row=4,column = 0)
         
+        self.checkbutton_detection_debug = tk.Checkbutton(self, text='Show Detection Images', var= main.debug_detection) 
+        self.checkbutton_detection_debug.grid(row=5,column = 0)
+        
         seperator_1 = ttk.Separator(self, orient="horizontal")
-        seperator_1.grid(row = 5, column = 0, sticky = tk.E + tk.W, pady=(5,5))
+        seperator_1.grid(row = 6, column = 0, sticky = tk.E + tk.W, pady=(5,5))
+        
         
         label_ip = tk.Label(self, text="Dart Detection:")
-        label_ip.grid(row = 6, column = 0, pady=(0,5))
+        label_ip.grid(row = 7, column = 0, pady=(0,5))
         
         label_min_pix = tk.Label(self, text="Minimum pixels for dart detection:")
         label_min_pix.grid(row = 8, column = 0)
@@ -91,7 +94,7 @@ class Frame_UI_Right(Frame):
         ### Initialize figure ### 
         self.fig = Figure(figsize = (2.5,2.5))
         self.ax = self.fig.add_subplot(111)
-        self.ax.set_ylim(0, 75)
+        #self.ax.set_ylim(0, 75)
         self.ax.plot(self.time_array, self.pix_array, linestyle = '-', marker = 'None', color='green', label= "Treshold")
         self.ax.plot(self.time_array, self.thresh_array, linestyle = '-', marker = 'None', color='red', label= "Pixels")
         
@@ -99,6 +102,17 @@ class Frame_UI_Right(Frame):
         
         self.graph = FigureCanvasTkAgg(self.fig, master= self)
         self.graph.get_tk_widget().grid(row = 7, column = 0, sticky = tk.E)
+        
+        seperator_2 = ttk.Separator(self, orient="horizontal")
+        seperator_2.grid(row = 10, column = 0, sticky = tk.E + tk.W, pady=(5,5))
+        
+        label_total_count = tk.Label(self, text="Total number training images:")
+        label_total_count.grid(row = 11, column = 0, pady=(5,5))
+        
+        self.entry_total_count = tk.Entry(self, width = 20, justify='center')
+        self.entry_total_count.grid(row = 12, column = 0, pady=(5,5))
+        self.entry_total_count.configure(font=('verdana', 8))
+        self.entry_total_count.insert(0, "0")
         
         
     def draw_detection_plot(self,time_array, pix_array, thresh_array):

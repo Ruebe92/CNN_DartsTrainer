@@ -1,19 +1,6 @@
-import imutils
 import cv2
 from PIL import ImageTk, Image
 import numpy as np
-import time
-
-
-class Dart_Detector():
-    
-    def __init__(self):
-        
-        
-    
-
-
-
 
 
 
@@ -31,64 +18,6 @@ def process_frame(frame, blur):
     
     return t_image_processed, r_image_processed, t_image_raw, r_image_raw
 
-
-# Calculates the differences between a background image and an image
-def calc_background_dif(image, background_image, name, debug):
-    
-    if background_image is None:
-        
-        background_image = image
-    
-    frameDelta = cv2.absdiff(background_image, image)
-    
-    thresh = cv2.threshold(frameDelta, 25, 255, cv2.THRESH_BINARY)[1]
-    thresh = cv2.dilate(thresh, None, iterations=2)
-    
-    cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
-	cv2.CHAIN_APPROX_SIMPLE)
-    contours = imutils.grab_contours(cnts)
-	
-    debug_image = cv2.cvtColor(frameDelta,cv2.COLOR_GRAY2RGB)
-    
-    n_dif_pix = []
-    
-    if len(contours) != 0:
-        
-        # draw in blue the contours that were found
-        cv2.drawContours(debug_image, contours, -1, 255, 3)
-        
-        # find the biggest countour (c) by the area
-        c = max(contours, key = cv2.contourArea)
-        x,y,w,h = cv2.boundingRect(c)
-        
-        # draw the biggest contour (c) in green
-        cv2.rectangle(debug_image,(x,y),(x+w,y+h),(0,255,0),2)
-    
-    
-        for con in contours: 
-            
-            
-            if cv2.contourArea(con) > 400:
-                
-                if debug:
-                
-                    print(name + "  " +str(cv2.contourArea(con)))
-                
-                n_dif_pix.append(cv2.contourArea(con))
-                
-                            
-        n_dif_pix_tot = sum(n_dif_pix)
-    
-    else:
-        
-        n_dif_pix_tot = 0
-    
-    if debug:
-
-        cv2.imshow(name, debug_image)
-    
-    return n_dif_pix_tot, background_image
- 
    
 def resize_create(image, scale_percent): 
     
@@ -102,49 +31,6 @@ def resize_create(image, scale_percent):
     
     return photo
 
-def detect_darts(detection, time_last_throw, image, first_frame):
-    
-    if detection:
-        
-            ## Get pixel differences over the two pictures
-            dif_pix, first_frame = calc_background_dif(image, first_frame, "TOP", False)
-                       
-            return dif_pix, first_frame
-           
-def count_darts(main, dart_counter, t_image_raw, r_image_raw, dif_pix):   
-
-
-    main.time_last_throw = time.time()
-    
-    #Set the Background frames to None to force the app to get new images after the delay
-    main.t_firstFrame = None
-    main.r_firstFrame = None
-    
-    dart_counter = dart_counter + 1    
-    
-    main.text_display.print_to_display(str(dart_counter) + ". dart thrown: " + str(dif_pix) + " white pixels")
-    
-    if main.dart_counter == 3:
-        
-        main.t_dart_images.append(t_image_raw)
-        main.r_dart_images.append(r_image_raw)
-        
-        
-        main.detection = False
-        main.text_display.print_to_display("Detection set to False, get the darts")
-        
-        main.time_start_throw = time.time()
-        main.button_save_and_next.config(state = "normal")
-
-    ##Delay a bit to get a still board again
-    time.sleep(1)
-    
-    return dart_counter
- 
-def save_images(counter, ):
-
-
-       
 
 def outline_from_image(image, bw_threshold, cannyMin, cannyMax):
 

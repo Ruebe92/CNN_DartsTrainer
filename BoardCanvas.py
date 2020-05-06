@@ -74,7 +74,7 @@ class BoardCanvas:
                 
                 
         self.markers = []
-        
+        self.dart = 0
         self.boardCanvas.draw()
         
         self.main.text_display.print_to_display("Board has been cleared!")
