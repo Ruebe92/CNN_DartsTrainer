@@ -12,6 +12,7 @@ class Dart_Detector():
         
         self.time_threshold = 0.3
         self.delay_after_shot = 0.5
+        self.peak_dif_pix = 0
         
         self.t_image_raw = []
         self.r_image_raw = []
@@ -36,8 +37,16 @@ class Dart_Detector():
             dif_pix_right, self.main.first_frame_right = self.calc_background_dif(self.main.image_right, self.main.first_frame_right, self.main.image_raw_right)
 
             self.dif_pix = dif_pix_top + dif_pix_right  
+            
+            if self.dif_pix > self.peak_dif_pix:
+                
+                self.peak_dif_pix = self.dif_pix
+                
+                print(self.peak_dif_pix)
+                
             self.min_pix = self.main.frame_UI_right.scale_min_pix.get()
-                 
+                
+            
             
             # Save to array for debugging & plotting
             self.time_array.append(time.time())                 
@@ -48,6 +57,11 @@ class Dart_Detector():
                 
                 self.collect_images()
                 self.count_darts()
+                
+                self.peak_dif_pix = 0
+                
+                ##Delay a bit to get a still board again
+                time.sleep(self.delay_after_shot)
     
     
     
@@ -102,8 +116,7 @@ class Dart_Detector():
             self.main.time_start_throw = time.time()
             self.main.frame_UI_left.button_save_and_next.config(state = "normal")
     
-        ##Delay a bit to get a still board again
-        time.sleep(self.delay_after_shot)
+        
         
  
     

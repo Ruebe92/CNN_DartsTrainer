@@ -16,6 +16,18 @@ class CSV_Handler():
                 
                 writer = csv.writer(f)
                 writer.writerow(["Total Count, Dart Count, X, Y"])
+                
+    def save_result(self, count, x, y):
+        
+        with open(self.file_name,'a', newline = '') as f:
+                
+                writer = csv.writer(f)
+                
+                self.count_lines()
+                
+                writer.writerow([self.main.total_count, count, x, y])
+            
+    
         
         
     def count_lines(self):
@@ -33,5 +45,6 @@ class CSV_Handler():
         else:
             
             self.main.total_count = sum(1 for row in open(self.file_name)) - 1
+            
             self.main.frame_UI_right.entry_total_count.delete(0,8)
             self.main.frame_UI_right.entry_total_count.insert(0, str(self.main.total_count))

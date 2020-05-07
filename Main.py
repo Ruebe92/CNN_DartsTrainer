@@ -84,14 +84,16 @@ class Main:
             file_name = str(self.dir) + temp_name
             
             cv2.imshow(disp_name, self.dart_detector.image_result[count])
-            
-            print(file_name)
-            
+                        
             cv2.imwrite(file_name, self.dart_detector.image_result[count])
             
+            ## Save csv
             
-
+            self.csv_handler.save_result(count, x, y)
+            
             count += 1
+            
+        self.csv_handler.count_lines()
         
            
     def update(self):
