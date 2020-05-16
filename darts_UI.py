@@ -115,12 +115,13 @@ class Frame_UI_Right(Frame):
         self.entry_total_count.insert(0, "0")
         
         
-    def draw_detection_plot(self,time_array, pix_array, thresh_array):
+    # def draw_detection_plot(self,time_array, pix_array, thresh_array):
         
-        self.ax.plot(time_array, pix_array, linestyle = '-', marker = 'None', color='green', label= "Treshold")
-        self.ax.plot(time_array, thresh_array, linestyle = '-', marker = 'None', color='red', label= "Pixels")
-        self.graph.draw()
-
+    #     self.ax.plot(time_array, pix_array, linestyle = '-', marker = 'None', color='green', label= "Treshold")
+    #     self.ax.plot(time_array, thresh_array, linestyle = '-', marker = 'None', color='red', label= "Pixels")
+    #     self.graph.draw()
+        
+    
 
     
 class Frame_UI_Video(Frame):

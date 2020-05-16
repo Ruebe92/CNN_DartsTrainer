@@ -10,8 +10,8 @@ class Dart_Detector():
         self.main = main
         self.detection = True
         
-        self.time_threshold = 0.3
-        self.delay_after_shot = 0.5
+        self.time_threshold = 0.5
+        self.delay_after_shot = 0.35
         self.peak_dif_pix = 0
         
         self.t_image_raw = []
@@ -25,6 +25,11 @@ class Dart_Detector():
         self.first_frame_right = None
         
         self.image_result = []
+        self.time_plus_delay = []
+        self.delay_flag = False
+        self.abs_delay_time = 1000
+        
+        
 
     def detect(self):
         
@@ -42,27 +47,50 @@ class Dart_Detector():
                 
                 self.peak_dif_pix = self.dif_pix
                 
-                print(self.peak_dif_pix)
-                
+
             self.min_pix = self.main.frame_UI_right.scale_min_pix.get()
+            
+            if self.dif_pix > self.min_pix and self.delay_flag == False:
                 
-            
-            
+                self.delay_flag = True
+                self.abs_delay_time = time.time() + self.delay_after_shot
+                self.draw_shot(time.time(),'b')
+                
+                
+            if time.time() > self.abs_delay_time and self.delay_flag == True:
+                
+                self.delay_flag = False
+                
+                
+                self.collect_images()
+                self.count_darts()       
+                self.peak_dif_pix = 0         
+                
+                self.draw_shot(time.time(),'g')
+                
+                self.reset_images()
+                
+                
+                
+                
             # Save to array for debugging & plotting
             self.time_array.append(time.time())                 
             self.pix_array.append(self.dif_pix)
             self.thresh_array.append(self.min_pix)
             
-            if self.dif_pix > self.min_pix and time_since_last_throw > self.time_threshold:
-                
-                self.collect_images()
-                self.count_darts()
-                
-                self.peak_dif_pix = 0
-                
-                ##Delay a bit to get a still board again
-                time.sleep(self.delay_after_shot)
-    
+            
+
+    def reset_images(self):
+        #Set the Background frames to None to force the app to get new images after the delay
+        self.main.first_frame_top = None
+        self.main.first_frame_right = None
+        self.main.first_frame_top_raw = None
+        self.main.first_frame_right_raw = None
+
+            
+            
+
+
     
     
     def collect_images(self):
@@ -96,13 +124,6 @@ class Dart_Detector():
 
 
         self.main.time_last_throw = time.time()
-        
-        #Set the Background frames to None to force the app to get new images after the delay
-        self.main.first_frame_top = None
-        self.main.first_frame_right = None
-        self.main.first_frame_top_raw = None
-        self.main.first_frame_right_raw = None
-        
         
         self.main.dart_count += 1   
         
@@ -178,6 +199,11 @@ class Dart_Detector():
         self.main.frame_UI_right.ax.plot(self.time_array, self.thresh_array, linestyle = '-', marker = 'None', color='green', label= "Treshold")
         self.main.frame_UI_right.ax.plot(self.time_array, self.pix_array, linestyle = '-', marker = 'None', color='red', label= "Pixels")
         self.main.frame_UI_right.graph.draw()
+        
+        
+    def draw_shot(self, time, color):
+        
+        self.main.frame_UI_right.ax.axvline(x = time, color= color)
             
             
     def reset(self):
