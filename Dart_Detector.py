@@ -86,7 +86,7 @@ class Dart_Detector():
         self.main.first_frame_right = None
         self.main.first_frame_top_raw = None
         self.main.first_frame_right_raw = None
-
+        
             
             
 

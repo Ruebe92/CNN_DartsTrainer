@@ -5,26 +5,18 @@ import numpy as np
 import math
 import tkinter
 
-r_full = 45.5/2
-r_inner_triple = 19.3/2
-r_outer_triple = 21.3/2
-r_inner_double = 32.0/2
-r_outer_double = 34.0/2
-r_outer_rim = 40.0/2
 
-
-
-def draw_segment(seg,ax):
+def draw_segment(seg):
     
     if (seg % 2) == 0 or seg == 0:
         
-        mainColor = 'w'
-        secondColor = 'g'
+        mainColor = 'k'
+        secondColor = 'r'
         
     else: 
         
-        mainColor = 'k'
-        secondColor = 'r'
+        mainColor = 'w'
+        secondColor = 'g'
         
     angle = 360/20 * seg
     
@@ -99,51 +91,60 @@ def draw_segment(seg,ax):
     ax.add_artist(patch)
 
 
-def Draw_Dartboard():
-     
-    board_full = plt.Circle((0, 0), r_full, color='k', zorder = 0)
+
     
-    inner_triple = plt.Circle((0, 0), r_inner_triple, color='w', zorder = 0)
-    outer_triple = plt.Circle((0, 0), r_outer_triple, color='g', zorder = 0)
+r_full = 45.5/2
+r_inner_triple = 19.3/2
+r_outer_triple = 21.3/2
+r_inner_double = 32.0/2
+r_outer_double = 34.0/2
+r_outer_rim = 40.0/2
+
+
+board_full = plt.Circle((0, 0), r_full, color='k', zorder = 0)
+
+inner_triple = plt.Circle((0, 0), r_inner_triple, color='w', zorder = 0)
+outer_triple = plt.Circle((0, 0), r_outer_triple, color='g', zorder = 0)
+
+inner_double = plt.Circle((0, 0), r_inner_double, color='w', zorder = 0)
+outer_double = plt.Circle((0, 0), r_outer_double, color='g', zorder = 0)
+
+double_Bull = plt.Circle((0, 0), 1.4/2, color='r', zorder = 3)
+single_Bull = plt.Circle((0, 0), 3.3/2, color='g', zorder = 2)
+
+arc = patches.Arc((0,0),0, 100, angle= 10, theta1=3 , theta2=360.0)
+
+
+fig = plt.figure(figsize = (2.5,2.5))
+
+ax = fig.add_subplot(111)
     
-    inner_double = plt.Circle((0, 0), r_inner_double, color='w', zorder = 0)
-    outer_double = plt.Circle((0, 0), r_outer_double, color='g', zorder = 0)
+ax.add_artist(board_full)
+ax.add_artist(outer_double)
+ax.add_artist(inner_double)
+ax.add_artist(outer_triple)
+ax.add_artist(inner_triple)
+
+
+field_number = ["6","13","4","18","1","20","5","12","9","14","11","8","16","7","19","3","17","2","15","10"]
+
+
+for seg in range(20):
     
-    double_Bull = plt.Circle((0, 0), 1.4/2, color='r', zorder = 3)
-    single_Bull = plt.Circle((0, 0), 3.3/2, color='g', zorder = 2)
+    draw_segment(seg)
     
-    arc = patches.Arc((0,0),0, 100, angle= 10, theta1=3 , theta2=360.0)
+    angle_text = 360/20 * seg
     
-    
-    fig = plt.figure(figsize = (2.5,2.5))
-    
-    ax = fig.add_subplot(111)
-        
-    ax.add_artist(board_full)
-    ax.add_artist(outer_double)
-    ax.add_artist(inner_double)
-    ax.add_artist(outer_triple)
-    ax.add_artist(inner_triple)
-    
-    
-    field_number = ["6","13","4","18","1","20","5","12","9","14","11","8","16","7","19","3","17","2","15","10"]
-    
-    
-    for seg in range(20):
-        
-        draw_segment(seg, ax)
-        
-        angle_text = 360/20 * seg
-        
-        x_text = math.cos(math.radians(angle_text)) * r_outer_rim
-        y_text = math.sin(math.radians(angle_text)) * r_outer_rim
-    
-        plt.text(x_text, y_text, field_number[seg], size=10, rotation=0, ha="center", va="center", color='white', fontsize=20)
-    
-    ax.add_artist(single_Bull)
-    ax.add_artist(double_Bull)
-    
-    ax.axis(xmin=-30,xmax=30)
-    ax.axis(ymin=-30,ymax=30)
-    
-    return fig, ax
+    x_text = math.cos(math.radians(angle_text)) * r_outer_rim
+    y_text = math.sin(math.radians(angle_text)) * r_outer_rim
+
+    plt.text(x_text, y_text, field_number[seg], size=10, rotation=0, ha="center", va="center", color='white', fontsize=20)
+
+ax.add_artist(single_Bull)
+ax.add_artist(double_Bull)
+
+ax.axis(xmin=-30,xmax=30)
+ax.axis(ymin=-30,ymax=30)
+
+
+

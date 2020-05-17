@@ -33,7 +33,7 @@ class Main:
         self.frame_UI_left.table.reset()
         self.canvas_board.reset()
     
-    def next_throw(self):
+    def save_and_next(self, *event):
         
         ### Save
         self.save()
@@ -43,6 +43,18 @@ class Main:
         self.dart_detector.reset()
         self.dart_detector.detection = True
         self.dart_count = 0
+        
+    def del_and_next(self):
+        
+        ### Reset
+        self.reset()
+        self.dart_detector.reset()
+        self.dart_detector.detection = True
+        self.dart_count = 0
+        
+        self.dart_detector.image_result = []
+        
+        
         
     def connect(self):
         
@@ -78,12 +90,12 @@ class Main:
             y_file = str(y).replace(".","")
 
             ## Save Image
-
-            temp_name = "/total_count_" +  str(count) + "_" + x_file + "_" + y_file + ".jpg"
-
-            file_name = str(self.dir) + temp_name
             
-            cv2.imshow(disp_name, self.dart_detector.image_result[count])
+            temp_name = str(self.total_count) + "_" +  str(count) + "_" + x_file + "_" + y_file + ".jpg"
+
+            file_name = str(self.dir) + "/" + temp_name
+            
+            #cv2.imshow(disp_name, self.dart_detector.image_result[count])
                         
             cv2.imwrite(file_name, self.dart_detector.image_result[count])
             
@@ -93,6 +105,8 @@ class Main:
             
             count += 1
             
+            
+        self.dart_detector.image_result = []   
         self.csv_handler.count_lines()
         
            
@@ -174,6 +188,8 @@ class Main:
         self.dart_detector = Dart_Detector(self)
         
         self.csv_handler = CSV_Handler(self)
+        
+        root.bind('<Return>', self.save_and_next)
         
         self.start()
         

@@ -37,10 +37,10 @@ class Frame_UI_Left(Frame):
         self.button_cancel.config(bg = "red",width = 12, height = 2)
         
         self.button_delete_and_next = Button(self,1, 5, 2, 1, "Delete & \n Next Throw")
-        self.button_delete_and_next.config(bg = "red",width = 12, height = 6, state = "normal")
+        self.button_delete_and_next.config(command = main.del_and_next, bg = "red",width = 12, height = 6, state = "normal")
         
         self.button_save_and_next = Button(self,1, 6, 2, 1, "Save & \n Next Throw")
-        self.button_save_and_next.config(command = main.next_throw, bg = "green", width = 12, height = 6)
+        self.button_save_and_next.config(command = main.save_and_next, bg = "green", width = 12, height = 6)
 
 class Frame_UI_Right(Frame):
     
