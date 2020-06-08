@@ -8,7 +8,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import colors as mcolors
 
-import dartshelper as dh
+import Darts_Helper as dh
 
 class Frame(tk.Frame): 
 

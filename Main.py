@@ -1,9 +1,9 @@
-import BoardCanvas
+import Board_Canvas
 
-from DartsVideoCapture import DartsVideoCapture
+from Darts_Video_Capture import DartsVideoCapture
 
-import dartshelper as dh
-import darts_UI
+import Darts_Helper as dh
+import Darts_UI
 from Dart_Detector import Dart_Detector
 from CSV_Handler import CSV_Handler
 
@@ -175,15 +175,15 @@ class Main:
         self.r_bl_color, self.r_bl_alpha = dh.outline_from_image(cv2.imread("r_image_raw_baseline.jpg"), 180, 300, 500)
         
 
-        self.canvas_board = BoardCanvas.BoardCanvas(self.window, 640, 640, 0, 0, self)
+        self.canvas_board = Board_Canvas.BoardCanvas(self.window, 640, 640, 0, 0, self)
         
-        self.frame_UI_left = darts_UI.Frame_UI_Left(self.window, 640, 300, 3, 0, self)       
+        self.frame_UI_left = Darts_UI.Frame_UI_Left(self.window, 640, 300, 3, 0, self)       
         
-        self.frame_UI_right = darts_UI.Frame_UI_Right(self.window, 0, 0, 0, 1, self)
+        self.frame_UI_right = Darts_UI.Frame_UI_Right(self.window, 0, 0, 0, 1, self)
         
-        self.frame_UI_video = darts_UI.Frame_UI_Video(self.window, 532, 640, 0, 2, self)
+        self.frame_UI_video = Darts_UI.Frame_UI_Video(self.window, 532, 640, 0, 2, self)
         
-        self.text_display = darts_UI.Text_Display(self.window, 65, 10, 3, 2)
+        self.text_display = Darts_UI.Text_Display(self.window, 65, 10, 3, 2)
         
         self.dart_detector = Dart_Detector(self)
         
