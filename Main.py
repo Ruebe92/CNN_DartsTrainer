@@ -142,7 +142,9 @@ class Main:
         
         self.url = "http://192.168.0.42:8000/video_feed"
         
-        self.dir = Path('F:/Darts_Results/')
+        self.dir = Path('C:/Projects/')
+        
+        
         
         
         ### Initilialize variables ###
